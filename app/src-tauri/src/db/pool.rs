@@ -10,8 +10,7 @@ pub type DbPool = SqlitePool;
 /// Migrations are idempotent: SQLx tracks applied migrations in `_sqlx_migrations`;
 /// already-applied migrations are skipped on subsequent runs.
 ///
-/// SQLite handles force-quit resilience via WAL mode (default). Avoid long uncommitted
-/// transactions; Migrator completes before the app serves requests.
+/// Avoid long uncommitted transactions; Migrator completes before the app serves requests.
 ///
 /// Returns the pool and the database path for logging.
 pub async fn init_db(app_data_dir: PathBuf) -> Result<(DbPool, PathBuf), AppError> {

@@ -25,15 +25,25 @@ pub fn run() {
         ]).build())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
-            let app_data_dir = app.path().app_data_dir()
-                .map_err(|e| AppError::database(format!("Failed to get app data dir: {}", e)))?;
+            let app_data_dir = match app.path().app_data_dir() {
+                Ok(dir) => dir,
+                Err(e) => {
+                    tracing::error!("Failed to get app data dir: {}", e);
+                    return Ok(());
+                }
+            };
 
-            let (pool, db_path) = tauri::async_runtime::block_on(async move {
-                init_db(app_data_dir).await
-            })?;
+            let init_result = tauri::async_runtime::block_on(async move { init_db(app_data_dir).await });
 
-            app.manage(pool);
-            tracing::info!("Database initialized at {}", db_path.display());
+            match init_result {
+                Ok((pool, db_path)) => {
+                    app.manage(pool);
+                    tracing::info!("Database initialized at {}", db_path.display());
+                }
+                Err(e) => {
+                    tracing::error!("Database initialization failed: {}", e);
+                }
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![greet])

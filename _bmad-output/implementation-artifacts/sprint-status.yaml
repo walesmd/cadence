@@ -42,7 +42,7 @@ story_location: "_bmad-output/implementation-artifacts"
 development_status:
   epic-1: in-progress
   1-1-set-up-full-tech-stack-on-tauri-scaffold: done
-  1-2-initialize-local-database-with-platform-storage: ready-for-dev
+  1-2-initialize-local-database-with-platform-storage: done
   1-3-multi-window-architecture-with-global-hotkey: backlog
   1-4-dashboard-shell-with-sidebar-navigation: backlog
   1-5-cross-platform-ci-cd-pipeline: backlog

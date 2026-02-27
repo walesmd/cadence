@@ -15,7 +15,8 @@
 ## System layer: SQLite
 
 **Location (default):**  
-macOS `~/Library/Application Support/cadence/cadence.db`, Windows `%APPDATA%/cadence/cadence.db`, Linux `~/.local/share/cadence/cadence.db` (or configurable).
+Uses Tauri's `app_data_dir()` (bundle identifier as subfolder):  
+macOS `~/Library/Application Support/com.cadence.app/cadence.db`, Windows `%APPDATA%/com.cadence.app/cadence.db`, Linux `~/.local/share/com.cadence.app/cadence.db` (or configurable).
 
 **Role:** Single source of truth for the app. All capture, context, and generated reviews are written here. The UI and automation (scheduled reviews, on-demand) read and write the DB.
 

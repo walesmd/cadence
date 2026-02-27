@@ -1,6 +1,9 @@
+pub mod db;
 mod error;
 
+use db::init_db;
 use error::AppError;
+use tauri::Manager;
 use tauri_plugin_log::{Target, TargetKind};
 
 #[tauri::command]
@@ -21,6 +24,18 @@ pub fn run() {
             Target::new(TargetKind::Webview),
         ]).build())
         .plugin(tauri_plugin_opener::init())
+        .setup(|app| {
+            let app_data_dir = app.path().app_data_dir()
+                .map_err(|e| AppError::database(format!("Failed to get app data dir: {}", e)))?;
+
+            let (pool, db_path) = tauri::async_runtime::block_on(async move {
+                init_db(app_data_dir).await
+            })?;
+
+            app.manage(pool);
+            tracing::info!("Database initialized at {}", db_path.display());
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![greet])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

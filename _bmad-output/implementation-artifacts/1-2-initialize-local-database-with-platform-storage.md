@@ -1,6 +1,6 @@
 # Story 1.2: Initialize Local Database with Platform Storage
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -34,32 +34,32 @@ So that my data has a persistent, reliable home that survives app restarts and u
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Add SQLx and platform path dependencies (AC: 1)
-  - [ ] 1.1 Add sqlx to Cargo.toml with features: sqlite, runtime-tokio, migrate, chrono
-  - [ ] 1.2 Add tauri::path::app_data_dir() or equivalent for platform app data path
-  - [ ] 1.3 Create app data directory if it does not exist
-  - [ ] 1.4 Resolve database path: `{app_data_dir}/cadence.db`
+- [x] Task 1: Add SQLx and platform path dependencies (AC: 1)
+  - [x] 1.1 Add sqlx to Cargo.toml with features: sqlite, runtime-tokio, migrate, chrono
+  - [x] 1.2 Add tauri::path::app_data_dir() or equivalent for platform app data path
+  - [x] 1.3 Create app data directory if it does not exist
+  - [x] 1.4 Resolve database path: `{app_data_dir}/cadence.db`
 
-- [ ] Task 2: Create initial migration (AC: 2)
-  - [ ] 2.1 Create `app/src-tauri/migrations/` directory
-  - [ ] 2.2 Create `001_initial_schema.sql` with tables: activity_entries, context_items, reviews, metadata
-  - [ ] 2.3 Follow architecture naming: snake_case, plural table names, indexes per pattern
-  - [ ] 2.4 Add schema_version to metadata table; set to 1
+- [x] Task 2: Create initial migration (AC: 2)
+  - [x] 2.1 Create `app/src-tauri/migrations/` directory
+  - [x] 2.2 Create `001_initial_schema.sql` with tables: activity_entries, context_items, reviews, metadata
+  - [x] 2.3 Follow architecture naming: snake_case, plural table names, indexes per pattern
+  - [x] 2.4 Add schema_version to metadata table; set to 1
 
-- [ ] Task 3: Initialize database layer (AC: 1, 2, 3, 4)
-  - [ ] 3.1 Create `app/src-tauri/src/db/` module (mod.rs, pool.rs or init.rs)
-  - [ ] 3.2 Implement async pool init: create/open DB, run migrations via sqlx::migrate!
-  - [ ] 3.3 Wire DB init into Tauri startup (lib.rs run()) before builder
-  - [ ] 3.4 Return AppError on init failure; log success with DB path
+- [x] Task 3: Initialize database layer (AC: 1, 2, 3, 4)
+  - [x] 3.1 Create `app/src-tauri/src/db/` module (mod.rs, pool.rs or init.rs)
+  - [x] 3.2 Implement async pool init: create/open DB, run migrations via sqlx::migrate!
+  - [x] 3.3 Wire DB init into Tauri startup (lib.rs run()) before builder
+  - [x] 3.4 Return AppError on init failure; log success with DB path
 
-- [ ] Task 4: Verify idempotent migration (AC: 3)
-  - [ ] 4.1 Document that Migrator::run() is idempotent (sqlx tracks applied migrations)
-  - [ ] 4.2 Add smoke test or manual verification: second launch does not re-apply
+- [x] Task 4: Verify idempotent migration (AC: 3)
+  - [x] 4.1 Document that Migrator::run() is idempotent (sqlx tracks applied migrations)
+  - [x] 4.2 Add smoke test or manual verification: second launch does not re-apply
 
-- [ ] Task 5: Handle force-quit resilience (AC: 5)
-  - [ ] 5.1 Rely on SQLite WAL mode (default) for durability
-  - [ ] 5.2 Ensure Migrator completes before app serves requests
-  - [ ] 5.3 Document: SQLite handles mid-write; app should avoid long uncommitted transactions
+- [x] Task 5: Handle force-quit resilience (AC: 5)
+  - [x] 5.1 Rely on SQLite WAL mode (default) for durability
+  - [x] 5.2 Ensure Migrator completes before app serves requests
+  - [x] 5.3 Document: SQLite handles mid-write; app should avoid long uncommitted transactions
 
 ## Dev Notes
 
@@ -192,12 +192,30 @@ Tauri 2 exposes paths via the app context. At startup, before the builder runs, 
 
 ### Agent Model Used
 
-(Auto - create-story workflow)
+Auto (dev-story workflow)
 
 ### Debug Log References
 
 ### Completion Notes List
 
 - Ultimate context engine analysis completed — comprehensive developer guide created (create-story workflow)
+- SQLx 0.8 added with sqlite, runtime-tokio, migrate, chrono. Platform path via app.path().app_data_dir() in setup hook.
+- migrations/001_initial_schema.sql with activity_entries, context_items, reviews, metadata. db/pool.rs init_db creates dir, opens DB, runs migrations.
+- DB init in Builder::setup using tauri::async_runtime::block_on; pool stored via app.manage(). Logs path on success.
+- Integration test tests/db_init_test.rs verifies tables exist and migrations are idempotent (second init does not re-apply).
+- [Code Review] Added pool.rs docs for Migrator idempotency and SQLite mid-write resilience. Updated STORAGE-FORMAT.md with actual Tauri path (com.cadence.app). Added Cargo.lock to File List.
+
+### Change Log
+
+- 2026-02-26: Code review fixes — pool.rs documentation, STORAGE-FORMAT path, Cargo.lock in File List.
+- 2026-02-26: Story 1.2 implementation complete — SQLite + SQLx, platform app data dir, migrations, db module, integration test.
 
 ### File List
+
+- app/src-tauri/Cargo.lock (modified)
+- app/src-tauri/Cargo.toml (modified)
+- app/src-tauri/migrations/001_initial_schema.sql (new)
+- app/src-tauri/src/db/mod.rs (new)
+- app/src-tauri/src/db/pool.rs (new)
+- app/src-tauri/src/lib.rs (modified)
+- app/src-tauri/tests/db_init_test.rs (new)
